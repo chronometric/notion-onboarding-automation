@@ -21,6 +21,28 @@ Production-ready starter for a Notion-based onboarding pipeline for a digital ma
 
 See detailed workflow in `docs/automation-blueprint.md`.
 
+```mermaid
+flowchart LR
+    T[Typeform] -->|New submission| Z[Zapier]
+    Z -->|POST /webhooks/typeform| B[Webhook Backend]
+    B --> N[Notion]
+    B --> S[Slack]
+    B --> G[Google Sheets]
+
+    N -->|Status = Qualified| M[Make]
+    M -->|POST /webhooks/lead-qualified| B
+    B --> ST[Stripe]
+    M --> GW[Google Workspace]
+
+    ST -->|payment_intent.succeeded| B
+    B -->|Create project + invoice| N
+    B -->|Kickoff notification| S
+    B -->|Dashboard sync| G
+
+    B -. Failure alert .-> S
+    M -. Retry/backoff .-> B
+```
+
 ## Canonical performance metrics
 
 Use this same metric set in proposals, case studies, and handover docs:
