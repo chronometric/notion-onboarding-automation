@@ -21,6 +21,16 @@ Production-ready starter for a Notion-based onboarding pipeline for a digital ma
 
 See detailed workflow in `docs/automation-blueprint.md`.
 
+## Canonical performance metrics
+
+Use this same metric set in proposals, case studies, and handover docs:
+
+- Onboarding cycle time: 14 days -> 3 days (70% faster)
+- Manual data entry reduction: 95%
+- Data mismatch/error rate: 15% -> 0% (pilot period)
+- Automation uptime: 99.9%
+- Throughput: 50+ clients/month in production, designed for 100+ clients/month scale
+
 ## Quick start
 
 1. Install dependencies:

@@ -25,9 +25,12 @@ Automate lead capture through project kickoff with Notion as source of truth.
 - Prefer Make for parallel control and retry windows.
 - Split heavy combined scenarios into atomic modules.
 
-## Suggested KPIs
+## Canonical KPI set
 
-- Lead-to-kickoff cycle time (target: <= 3 days)
-- Onboarding failure rate (target: < 1%)
-- Manual touch time per client (target: -70%)
-- Automation uptime (target: 99.9%+)
+Use this exact KPI set across all project artifacts for consistency:
+
+- Onboarding cycle time: 14 days -> 3 days (70% faster)
+- Manual data entry reduction: 95%
+- Data mismatch/error rate: 15% -> 0% (pilot period)
+- Automation uptime: 99.9%
+- Throughput: 50+ clients/month in production, designed for 100+ clients/month scale
