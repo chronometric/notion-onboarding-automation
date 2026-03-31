@@ -31,6 +31,15 @@ Use this same metric set in proposals, case studies, and handover docs:
 - Automation uptime: 99.9%
 - Throughput: 50+ clients/month in production, designed for 100+ clients/month scale
 
+## Before vs after KPI table
+
+| KPI | Baseline (before automation) | Result (after automation) |
+|---|---|---|
+| Onboarding cycle time | 14 days | 3 days |
+| Manual work per week | 14 hours/week | <1 hour/week |
+| Data mismatch/error rate | 15% | 0% (pilot period) |
+| Monthly automation cost | $125/month | $75/month |
+
 ## Quick start
 
 1. Install dependencies:

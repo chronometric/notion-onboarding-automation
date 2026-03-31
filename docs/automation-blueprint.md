@@ -34,3 +34,12 @@ Use this exact KPI set across all project artifacts for consistency:
 - Data mismatch/error rate: 15% -> 0% (pilot period)
 - Automation uptime: 99.9%
 - Throughput: 50+ clients/month in production, designed for 100+ clients/month scale
+
+## Before vs after KPI table
+
+| KPI | Baseline (before automation) | Result (after automation) |
+|---|---|---|
+| Onboarding cycle time | 14 days | 3 days |
+| Manual work per week | 14 hours/week | <1 hour/week |
+| Data mismatch/error rate | 15% | 0% (pilot period) |
+| Monthly automation cost | $125/month | $75/month |
