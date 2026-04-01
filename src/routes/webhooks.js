@@ -4,6 +4,8 @@ const { asyncHandler } = require("../utils/asyncHandler");
 const { createLead, markLeadQualified, createProjectAndInvoice } = require("../services/notionService");
 const { sendSlackMessage } = require("../services/slackService");
 const { createCustomer, verifyStripeSignature } = require("../services/stripeService");
+const { reserveEventKey } = require("../utils/idempotencyStore");
+const config = require("../config");
 
 const router = express.Router();
 
@@ -26,9 +28,24 @@ function getAnswerByRef(answers = [], ref) {
   );
 }
 
+function requireSharedSecret(req, res, next) {
+  const secret = req.headers["x-webhook-secret"];
+  if (!secret || secret !== config.WEBHOOK_SHARED_SECRET) {
+    return res.status(401).json({ ok: false, error: "Unauthorized webhook request" });
+  }
+  return next();
+}
+
+function resolveEventId(req, fallbackParts = []) {
+  const explicitEventId = req.headers["x-event-id"];
+  if (explicitEventId) return String(explicitEventId);
+  return fallbackParts.join(":");
+}
+
 router.post(
   "/typeform",
   express.json(),
+  requireSharedSecret,
   asyncHandler(async (req, res) => {
     const parsed = typeformSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -40,6 +57,10 @@ router.post(
     const email = getAnswerByRef(answers, "email");
     const company = getAnswerByRef(answers, "company");
     const service = getAnswerByRef(answers, "service_needed");
+    const eventId = resolveEventId(req, ["typeform", email, company, service]);
+    if (!reserveEventKey(eventId)) {
+      return res.status(200).json({ ok: true, duplicate: true, eventId });
+    }
 
     const lead = await createLead({ name, email, company, service });
 
@@ -54,6 +75,7 @@ router.post(
 router.post(
   "/lead-qualified",
   express.json(),
+  requireSharedSecret,
   asyncHandler(async (req, res) => {
     const schema = z.object({
       leadPageId: z.string().min(1),
@@ -63,6 +85,10 @@ router.post(
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ ok: false, error: "Invalid payload" });
+    }
+    const eventId = resolveEventId(req, ["lead-qualified", parsed.data.leadPageId]);
+    if (!reserveEventKey(eventId)) {
+      return res.status(200).json({ ok: true, duplicate: true, eventId });
     }
 
     await markLeadQualified({ leadPageId: parsed.data.leadPageId });
@@ -94,6 +120,10 @@ router.post(
     }
 
     if (event.type === "payment_intent.succeeded") {
+      const eventId = `stripe:${event.id}`;
+      if (!reserveEventKey(eventId)) {
+        return res.status(200).json({ received: true, duplicate: true, eventId });
+      }
       const paymentIntent = event.data.object;
       const metadata = paymentIntent.metadata || {};
       const leadName = metadata.leadName || "Unknown Lead";
